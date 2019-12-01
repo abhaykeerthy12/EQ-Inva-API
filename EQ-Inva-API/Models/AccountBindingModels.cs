@@ -48,6 +48,14 @@ namespace EQ_Inva_API.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        // custom columns for user
+        public string Name { get; set; }
+        public string Department { get; set; }
+        public bool Is_Admin { get; set; }
+        public bool Is_Manager { get; set; }
+        public bool Is_Active { get; set; }
+
     }
 
     public class RegisterExternalBindingModel

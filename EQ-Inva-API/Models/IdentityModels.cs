@@ -1,5 +1,7 @@
-﻿using System.Security.Claims;
+﻿using System.Data.Entity;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using EQ_Inva_API.Models.ProjectModel;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -16,6 +18,13 @@ namespace EQ_Inva_API.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        // custom columns for user
+        public string Name { get; set; }
+        public string Department { get; set; }
+        public bool Is_Admin { get; set; }
+        public bool Is_Manager { get; set; }
+        public bool Is_Active { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -24,7 +33,10 @@ namespace EQ_Inva_API.Models
             : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
-        
+
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Request> Requests { get; set; }
+
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
