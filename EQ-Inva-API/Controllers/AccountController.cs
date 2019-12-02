@@ -17,6 +17,10 @@ using EQ_Inva_API.Models;
 using EQ_Inva_API.Providers;
 using EQ_Inva_API.Results;
 using System.Linq;
+using System.IO;
+using ExcelDataReader;
+using System.Data;
+using System.Net;
 
 namespace EQ_Inva_API.Controllers
 {
@@ -346,6 +350,96 @@ namespace EQ_Inva_API.Controllers
             }
 
             return Ok();
+        }
+
+        // excel register user
+        // POST api/Account/ExcelRegister
+        [AllowAnonymous]
+        [Route("ExcelRegister")]
+        public async Task<IHttpActionResult> ExcelRegister()
+        {
+
+
+            string message = "";
+            HttpResponseMessage result = null;
+            var httpRequest = HttpContext.Current.Request;
+
+                if (httpRequest.Files.Count > 0)
+                {
+                    HttpPostedFile file = httpRequest.Files[0];
+                    Stream stream = file.InputStream;
+
+                    IExcelDataReader reader = null;
+
+                    if (file.FileName.EndsWith(".xls"))
+                    {
+                        reader = ExcelReaderFactory.CreateBinaryReader(stream);
+                    }
+                    else if (file.FileName.EndsWith(".xlsx"))
+                    {
+                        reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                    }
+                    else
+                    {
+                        message = "This file format is not supported";
+                    }
+
+                    DataSet excelRecords = reader.AsDataSet();
+                    reader.Close();
+
+                    var finalRecords = excelRecords.Tables[0];
+                    bool output = true;
+
+                    var UserPassword = "EQPwd123";
+
+                    for (int i = 0; i < finalRecords.Rows.Count; i++)
+                    {
+                        ApplicationUser objUser = new ApplicationUser();
+                        objUser.Name = finalRecords.Rows[i][0].ToString();
+                        objUser.UserName = finalRecords.Rows[i][1].ToString();
+                        objUser.Email = finalRecords.Rows[i][1].ToString();
+                        objUser.Department = finalRecords.Rows[i][2].ToString().ToUpper();
+
+                        if (
+                            (string.IsNullOrEmpty(objUser.Name) || string.IsNullOrEmpty(objUser.UserName)) ||
+                            (string.IsNullOrEmpty(objUser.Email) || string.IsNullOrEmpty(objUser.Department))
+                           )
+                        {
+                            message = "Fields are Empty";
+                            output = false;
+                            break;
+                        }
+                        
+
+                        IdentityResult status = await UserManager.CreateAsync(objUser, UserPassword);
+
+                        if (!status.Succeeded)
+                        {
+                            output = false;
+                        }
+
+                    }
+
+                if (!output)
+                {
+                    message = "Excel file uploaded has failed";
+                }
+                else
+                {
+
+                    message = "Excel file has been successfully uploaded";
+                }
+
+
+                }
+
+                else
+                {
+                    result = Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            
+            return Ok(message);
+
         }
 
         // POST api/Account/RegisterExternal

@@ -27,6 +27,8 @@ namespace EQ_Inva_API.Models.ProjectModel
 
         public string Summary { get; set; }
 
+        public bool ManagerValidated { get; set; }
+
         public DateTime RequestedDate { get; set; }
 
         public Request()
