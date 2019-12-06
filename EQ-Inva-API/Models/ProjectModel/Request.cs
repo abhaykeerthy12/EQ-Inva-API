@@ -36,6 +36,7 @@ namespace EQ_Inva_API.Models.ProjectModel
             this.RequestedDate = DateTime.Now;
             this.Status = "Pending";
             this.Summary = "To Be Validated By Manager";
+            this.ManagerValidated = false;
         }
     }
 }

@@ -17,6 +17,10 @@ namespace EQ_Inva_API
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
+            // upload files
+            config.Formatters.XmlFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("multipart/form-data"));
+
+
             // Web API routes
             config.MapHttpAttributeRoutes();
 

@@ -52,9 +52,13 @@ namespace EQ_Inva_API.Models
         // custom columns for user
         public string Name { get; set; }
         public string Department { get; set; }
-        public bool Is_Admin { get; set; }
-        public bool Is_Manager { get; set; }
         public bool Is_Active { get; set; }
+
+        public RegisterBindingModel()
+        {
+            this.Password = "EQPwd123";
+            this.ConfirmPassword = "EQPwd123";
+        }
 
     }
 

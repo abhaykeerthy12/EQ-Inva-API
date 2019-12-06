@@ -222,6 +222,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\RequestsController.cs" />
+    <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -249,12 +250,27 @@
     <Compile Include="Migrations\201912020100519_addedmanagerValidatedField.Designer.cs">
       <DependentUpon>201912020100519_addedmanagerValidatedField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912041840573_RemovedSomeFlagsFromUsers.cs" />
+    <Compile Include="Migrations\201912041840573_RemovedSomeFlagsFromUsers.Designer.cs">
+      <DependentUpon>201912041840573_RemovedSomeFlagsFromUsers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912042049291_MoreChangesToCome.cs" />
+    <Compile Include="Migrations\201912042049291_MoreChangesToCome.Designer.cs">
+      <DependentUpon>201912042049291_MoreChangesToCome.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912042050498_ChangesAdded.cs" />
+    <Compile Include="Migrations\201912042050498_ChangesAdded.Designer.cs">
+      <DependentUpon>201912042050498_ChangesAdded.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ProjectModel\Product.cs" />
     <Compile Include="Models\ProjectModel\Request.cs" />
+    <Compile Include="Models\ProjectModel\UserActivenessPatch.cs" />
+    <Compile Include="Models\ProjectModel\UserRoleClass.cs" />
+    <Compile Include="Models\ProjectModel\UserUpdateModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
@@ -366,6 +382,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912020100519_addedmanagerValidatedField.resx">
       <DependentUpon>201912020100519_addedmanagerValidatedField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912041840573_RemovedSomeFlagsFromUsers.resx">
+      <DependentUpon>201912041840573_RemovedSomeFlagsFromUsers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912042049291_MoreChangesToCome.resx">
+      <DependentUpon>201912042049291_MoreChangesToCome.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912042050498_ChangesAdded.resx">
+      <DependentUpon>201912042050498_ChangesAdded.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -21,6 +21,7 @@ using System.IO;
 using ExcelDataReader;
 using System.Data;
 using System.Net;
+using EQ_Inva_API.Models.ProjectModel;
 
 namespace EQ_Inva_API.Controllers
 {
@@ -71,6 +72,51 @@ namespace EQ_Inva_API.Controllers
             };
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route("AllUserData")]
+        // Get api/Account/AllUserData
+        public IHttpActionResult AllUserData()
+        {
+            var userId = System.Web.HttpContext.Current.User.Identity.GetUserId();
+
+            // get employee names
+            var userContext = new ApplicationDbContext();
+            var users = userContext.Users
+                        .Select(u => new
+                        {
+                            CurrentUserId = userId,
+                            Id = u.Id,
+                            Email = u.Email,
+                            Name = u.Name,
+                            Department = u.Department,
+                            Is_Active = u.Is_Active
+                        });
+
+            return Ok(users);
+
+        }
+
+        // PATCH /api/account/useractive
+        [Authorize(Roles = "Admin, Creator")]
+        [HttpPatch]
+        [Route("UserActive")]
+        public IHttpActionResult UserActive(UserActivenessPatch user)
+        {
+
+            var userscontext = new ApplicationDbContext();
+
+            var userelement = userscontext.Users.FirstOrDefault(u => u.Id == user.Id);
+            if (userelement == null)
+                return NotFound();
+            else
+            {
+                userelement.Is_Active = user.Is_Active;
+                userscontext.SaveChangesAsync();
+            }
+            return Ok();
+        }
+
         // POST api/Account/Logout
         [Route("Logout")]
         public IHttpActionResult Logout()
@@ -117,6 +163,27 @@ namespace EQ_Inva_API.Controllers
                 Logins = logins,
                 ExternalLoginProviders = GetExternalLogins(returnUrl, generateState)
             };
+        }
+
+        // PUT api/Account/UpdateUser
+        [HttpPut]
+        [Route("UpdateUser")]
+        public async Task<IHttpActionResult> UpdateUser(UserUpdateModel model)
+        {
+            var userscontext = new ApplicationDbContext();
+
+            var userelement = userscontext.Users.FirstOrDefault(u => u.Id == model.Id);
+            if (userelement == null)
+                return NotFound();
+            else
+            {
+                userelement.Name = model.Name;
+                userelement.Email = model.Email;
+                userelement.UserName = model.Email;
+                userelement.Department = model.Department;
+                await userscontext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            return Ok();
         }
 
         // POST api/Account/ChangePassword
@@ -340,6 +407,7 @@ namespace EQ_Inva_API.Controllers
                               Email = model.Email,
                               Name = model.Name,
                               Department = model.Department,
+                              Is_Active = true
                             };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
@@ -373,15 +441,16 @@ namespace EQ_Inva_API.Controllers
 
                     if (file.FileName.EndsWith(".xls"))
                     {
-                        reader = ExcelReaderFactory.CreateBinaryReader(stream);
+                       reader = ExcelReaderFactory.CreateBinaryReader(stream);
                     }
-                    else if (file.FileName.EndsWith(".xlsx"))
+                       else if (file.FileName.EndsWith(".xlsx"))
                     {
                         reader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                     }
                     else
                     {
-                        message = "This file format is not supported";
+                            message = "Unsupported File";
+                            return BadRequest(message);
                     }
 
                     DataSet excelRecords = reader.AsDataSet();
@@ -399,13 +468,14 @@ namespace EQ_Inva_API.Controllers
                         objUser.UserName = finalRecords.Rows[i][1].ToString();
                         objUser.Email = finalRecords.Rows[i][1].ToString();
                         objUser.Department = finalRecords.Rows[i][2].ToString().ToUpper();
+                        objUser.Is_Active = true;
 
-                        if (
+                    if (
                             (string.IsNullOrEmpty(objUser.Name) || string.IsNullOrEmpty(objUser.UserName)) ||
                             (string.IsNullOrEmpty(objUser.Email) || string.IsNullOrEmpty(objUser.Department))
                            )
                         {
-                            message = "Fields are Empty";
+                            message = "Empty";
                             output = false;
                             break;
                         }
@@ -422,7 +492,10 @@ namespace EQ_Inva_API.Controllers
 
                 if (!output)
                 {
-                    message = "Excel file uploaded has failed";
+                                                     
+                    message = "Invalid Data";
+                    return BadRequest(message);
+
                 }
                 else
                 {
@@ -435,8 +508,9 @@ namespace EQ_Inva_API.Controllers
 
                 else
                 {
-                    result = Request.CreateResponse(HttpStatusCode.BadRequest);
-                }
+                  message = "No File Found!";
+                  return BadRequest(message);
+                 }
             
             return Ok(message);
 
