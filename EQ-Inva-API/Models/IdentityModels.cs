@@ -23,6 +23,7 @@ namespace EQ_Inva_API.Models
         public string Name { get; set; }
         public string Department { get; set; }
         public bool Is_Active { get; set; }
+        public bool ChangedPwd { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

@@ -74,15 +74,32 @@ namespace EQ_Inva_API.Controllers
             try
             {
                 await db.SaveChangesAsync();
-
                 // sent mail to users
                 var productName = db.Products.Where(p => p.Id.ToString() == request.ProductId).SingleOrDefault()?.Name;
                 var employeeName = db.Users.Where(u => u.Id.ToString() == request.EmployeeId).SingleOrDefault()?.Name;
-
                 var unit = request.Quantity == 1 ? "unit" : "units";
-
                 var subject = $"Request {request.Status}";
-                var body = $"Hi {employeeName}, Your Request For {request.Quantity} {unit} of {productName} is {request.Status} by Admin. Check The Inva App For More Info!";
+                var status = "";
+                var role = "";
+                if (request.Status == "Proceed")
+                {
+                    status = "Validated, Approved and Forwarded To Admin";
+                    role = "Manager";
+                }
+                else if (request.Status == "Approved")
+                {
+                    status = "Approved";
+                    role = "Admin";
+                }
+                else if (request.Status == "Rejected")
+                {
+                    if(request.ManagerValidated)
+                        role = "Manager";
+                    else
+                        role = "Admin";
+                    status = "Rejected";
+                }
+                var body = $"Hi {employeeName}, Your Request For {request.Quantity} {unit} of {productName} is {status} by {role}. Check The Inva App For More Info!";
 
                 sendEmailViaWebApi(subject, body, "abhaykeerthy12@gmail.com");
             }
@@ -118,7 +135,7 @@ namespace EQ_Inva_API.Controllers
             db.Requests.Add(request);
             await db.SaveChangesAsync().ConfigureAwait(false);
 
-            // sent mail to admins
+            // sent mail to manager
 
             var productName = db.Products.Where(p => p.Id.ToString() == request.ProductId).SingleOrDefault()?.Name;
             var employeeName = db.Users.Where(u => u.Id.ToString() == request.EmployeeId).SingleOrDefault()?.Name;

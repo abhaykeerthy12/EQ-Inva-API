@@ -39,6 +39,12 @@ namespace EQ_Inva_API.Providers
                 context.SetError("invalid_grant", "The Email or password is incorrect.");
                 return;
             }
+            if (user.Is_Active == false)
+            {
+                context.SetError("User_Inactive", "The user is invactive pls contact admin!.");
+                return;
+            }
+
 
             ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(userManager,
                OAuthDefaults.AuthenticationType);
@@ -47,7 +53,12 @@ namespace EQ_Inva_API.Providers
 
             List<Claim> roles = oAuthIdentity.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();
 
-            AuthenticationProperties properties = CreateProperties(user.UserName, Newtonsoft.Json.JsonConvert.SerializeObject(roles.Select(x => x.Value)));
+            AuthenticationProperties properties = CreateProperties(
+                user.UserName, 
+                user.Name,
+                user.Department,
+                Newtonsoft.Json.JsonConvert.SerializeObject(roles.Select(x => x.Value))
+            );
             AuthenticationTicket ticket = new AuthenticationTicket(oAuthIdentity, properties);
             context.Validated(ticket);
             context.Request.Context.Authentication.SignIn(cookiesIdentity);
@@ -89,11 +100,13 @@ namespace EQ_Inva_API.Providers
             return Task.FromResult<object>(null);
         }
 
-        public static AuthenticationProperties CreateProperties(string userName, string Roles)
+        public static AuthenticationProperties CreateProperties(string userName, string Name, string Department, string Roles)
         {
             IDictionary<string, string> data = new Dictionary<string, string>
             {
                 { "userName", userName },
+                { "Name", Name },
+                { "Department", Department },
                 { "roles", Roles }
             };
             return new AuthenticationProperties(data);

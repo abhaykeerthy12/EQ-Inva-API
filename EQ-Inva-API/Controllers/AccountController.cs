@@ -22,6 +22,7 @@ using ExcelDataReader;
 using System.Data;
 using System.Net;
 using EQ_Inva_API.Models.ProjectModel;
+using System.Web.Http.Description;
 
 namespace EQ_Inva_API.Controllers
 {
@@ -90,6 +91,7 @@ namespace EQ_Inva_API.Controllers
                             Email = u.Email,
                             Name = u.Name,
                             Department = u.Department,
+                            ChangePwd = u.ChangedPwd,
                             Is_Active = u.Is_Active
                         });
 
@@ -190,6 +192,11 @@ namespace EQ_Inva_API.Controllers
         [Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
         {
+            var userscontext = new ApplicationDbContext();
+            var userid = User.Identity.GetUserId();
+            var userelement = userscontext.Users.FirstOrDefault(u => u.Id == userid);
+
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -197,7 +204,19 @@ namespace EQ_Inva_API.Controllers
 
             IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword,
                 model.NewPassword);
-            
+
+
+            if (userelement == null)
+                return NotFound();
+            else
+            {
+                if (userelement.ChangedPwd == false)
+                {
+                    userelement.ChangedPwd = true;
+                    await userscontext.SaveChangesAsync().ConfigureAwait(false);
+                }
+            }
+
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
@@ -338,7 +357,9 @@ namespace EQ_Inva_API.Controllers
 
                 List<Claim> roles = oAuthIdentity.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();
 
-                AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.UserName, Newtonsoft.Json.JsonConvert.SerializeObject(roles.Select(x => x.Value)));
+                AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(
+                    user.UserName, user.Name, user.Department,
+                    Newtonsoft.Json.JsonConvert.SerializeObject(roles.Select(x => x.Value)));
                 Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
             }
             else
@@ -406,7 +427,7 @@ namespace EQ_Inva_API.Controllers
                             { UserName = model.Email, 
                               Email = model.Email,
                               Name = model.Name,
-                              Department = model.Department,
+                              Department = model.Department.ToUpper(),
                               Is_Active = true
                             };
 
@@ -514,6 +535,23 @@ namespace EQ_Inva_API.Controllers
             
             return Ok(message);
 
+        }
+
+        // DELETE: api/account/deleteuser
+        public async Task<IHttpActionResult> Deleteuser(Guid id)
+        {
+            var userscontext = new ApplicationDbContext();
+
+            var userelement = userscontext.Users.FirstOrDefault(u => u.Id == id.ToString());
+            if (userelement == null)
+            {
+                return NotFound();
+            }
+
+            userscontext.Users.Remove(userelement);
+            await userscontext.SaveChangesAsync();
+
+            return Ok(userelement);
         }
 
         // POST api/Account/RegisterExternal

@@ -262,6 +262,10 @@
     <Compile Include="Migrations\201912042050498_ChangesAdded.Designer.cs">
       <DependentUpon>201912042050498_ChangesAdded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912071616015_AddedCHPWDFLAG.cs" />
+    <Compile Include="Migrations\201912071616015_AddedCHPWDFLAG.Designer.cs">
+      <DependentUpon>201912071616015_AddedCHPWDFLAG.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -391,6 +395,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912042050498_ChangesAdded.resx">
       <DependentUpon>201912042050498_ChangesAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912071616015_AddedCHPWDFLAG.resx">
+      <DependentUpon>201912071616015_AddedCHPWDFLAG.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

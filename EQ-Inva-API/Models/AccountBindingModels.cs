@@ -53,11 +53,14 @@ namespace EQ_Inva_API.Models
         public string Name { get; set; }
         public string Department { get; set; }
         public bool Is_Active { get; set; }
+        public bool ChangedPwd { get; set; }
+
 
         public RegisterBindingModel()
         {
             this.Password = "EQPwd123";
             this.ConfirmPassword = "EQPwd123";
+            this.ChangedPwd = false;
         }
 
     }
